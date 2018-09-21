@@ -18,3 +18,5 @@ module sram #(parameter ADDR_WIDTH = 6, DATA_WIDTH = 8, DEPTH = 64) (
         end
     end
 endmodule
+
+falula
