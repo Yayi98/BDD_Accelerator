@@ -16,6 +16,21 @@ reg [5:0] inputAddr;
 reg i_write;
 
 
+sram # (parameter ADDR_WIDTH = 6, DATA_WIDTH = 56, DEPTH = 64) sram_inst1 (
+    .i_clk(clk),
+    .i_addr(inputAddr),
+    .i_write(i_write),
+    .i_data(),
+    .o_data()
+);
+
+sram # (parameter ADDR_WIDTH = 6, DATA_WIDTH = 12, DEPTH = 64) sram_inst2 (
+    .i_clk(clk),
+    .i_addr(inputAddr),
+    .i_write(i_write),
+    .i_data(),
+    .o_data()
+);
 
 // BRAM_TDP_MACRO_inst coef(
 // .DOA(DOA_f),//Outputport-Adata,widthdefinedbyREAD_WIDTH_Aparameter
@@ -93,15 +108,19 @@ assign ENA= 1b'1;
 assign na=0;
 always@(posedge clk)
 
-// ADDMACC_MACRO code here
-
-if (~c)
 begin
-  ADDRA=na;
-  assign t = DOA_f[5:0];
-  if  t < PRODUCT
+  
+if (~c)
+begin  
+c1=o_data[35:30];c2=o_data[29:24];c3=o_data[23:18];c4=o_data[17:12];c5=o_data[11:6];c6=o_data[5:0];
+  
+t = ((A1*c1)+(A2*c2)+(A3*c3)+(A4*c4));
+
+  i_addr=na;
+  
+  if  (t < c6)
     begin
-          assign na=DOA_c[32:21];  //child address including the chld or class bit, so total 11+1=12 bits
+          assign na=o_data[32:21];  //child address including the chld or class bit, so total 11+1=12 bits
     end
   else
     begin
@@ -116,21 +135,6 @@ begin
      end
 end
 
-sram # (parameter ADDR_WIDTH = 6, DATA_WIDTH = 56, DEPTH = 64) sram_inst1 (
-    .i_clk(clk),
-    .i_addr(inputAddr),
-    .i_write(i_write),
-    .i_data(),
-    .o_data()
-);
-
-sram # (parameter ADDR_WIDTH = 6, DATA_WIDTH = 12, DEPTH = 64) sram_inst2 (
-    .i_clk(clk),
-    .i_addr(inputAddr),
-    .i_write(i_write),
-    .i_data(),
-    .o_data()
-);
 
 
 endmodule // top
