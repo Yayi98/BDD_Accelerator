@@ -18,18 +18,18 @@ reg i_write;
 
     sram # (parameter ADDR_WIDTH = 6, DATA_WIDTH = 48, DEPTH = 64) sram_inst1 (
     .i_clk(clk),
-    .i_addr(inputAddr1),
+    .i_addr(inputAddr),
     .i_write(i_write1),
     .i_data(),
-    .o_data()
+    .o_data(coeff)
 );
 
     sram # (parameter ADDR_WIDTH = 6, DATA_WIDTH = 18, DEPTH = 64) sram_inst2 (
     .i_clk(clk),
-    .i_addr(inputAddr2),
+    .i_addr(inputAddr),
     .i_write(i_write2),
     .i_da(),
-    .o_da()
+        .o_da(child)
 );
 
 
@@ -41,7 +41,7 @@ begin
   
 if (~c)
 begin  
-    c1=o_data[47:40];c2=o_data[39:32];c3=o_data[31:24];c4=o_data[23:16];c5=o_data[15:8];c6=o_data[7:0];
+    c1=coeff[47:40];c2=coeff[39:32];c3=coeff[31:24];c4=coeff[23:16];c5=coeff[15:8];c6=coeff[7:0];
   
 t = ((A1*c1)+(A2*c2)+(A3*c3)+(A4*c4));
 
@@ -49,15 +49,15 @@ t = ((A1*c1)+(A2*c2)+(A3*c3)+(A4*c4));
   
   if  (t < c6)
     begin
-        assign na=o_data[17:9];  //child address including the chld or class bit, so total 11+1=12 bits
+        assign na=child[17:9];  //child address including the chld or class bit, so total 11+1=12 bits
     end
   else
     begin
-        assign na=DOA_c[8:0];
+        assign na=child[8:0];
     end
 
 
-    if na[17]==1
+    if na[8]==1
     begin
       assign c=1;
       Output=na;
