@@ -6,14 +6,15 @@ input wire a3[7:0];
 input wire a4[7:0];
 input wire a5[7:0];
 input wire clk;
-output reg Output;
+output reg[8:0] Output;
 
-reg [7:0] cAdd;
-reg q;
-reg[8:0] na;
-reg c;          //class flag
-reg [5:0] inputAddr;
-reg i_write;
+
+
+reg[8:0] na =8'b00000000;;      //next address/class
+reg c =1'b0;          //class flag
+reg [7:0] c1,c2,c3,c4,c5;
+reg [15:0] c6;
+
 
 
     sram # (parameter ADDR_WIDTH = 6, DATA_WIDTH = 48, DEPTH = 64) sram_inst1 (
@@ -31,21 +32,19 @@ reg i_write;
     .i_da(),
         .o_da(child)
 );
+    mac mac_inst(.c1(c1),.c2(c2),.c3(c3),.c4(c4),.c5(c5),.c6(c6), .A1(a1),.A2(a2),.A1(a1),
+                 .A2(a2),.A3(a3),.A4(a4),.A5(a5), .Output(t), clk(clk));
 
 
-assign ENA= 1b'1;
-assign na=0;
+
 always@(posedge clk)
 
 begin
   
 if (~c)
-begin  
-    c1=coeff[47:40];c2=coeff[39:32];c3=coeff[31:24];c4=coeff[23:16];c5=coeff[15:8];c6=coeff[7:0];
-  
-t = ((A1*c1)+(A2*c2)+(A3*c3)+(A4*c4));
-
-    i_addr=na[7:0];
+begin 
+    inputAddr=na[7:0];
+    c1=coeff[47:40];c2=coeff[39:32];c3=coeff[31:24];c4=coeff[23:16];c5=coeff[15:8];c6=coeff[7:0] 
   
   if  (t < c6)
     begin
