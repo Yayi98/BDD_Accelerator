@@ -124,7 +124,7 @@ sram # (parameter ADDR_WIDTH = 6, DATA_WIDTH = 56, DEPTH = 64) sram_inst1 (
     .o_data()
 );
 
-sram # (parameter ADDR_WIDTH = 6, DATA_WIDTH = 6, DEPTH = 64) sram_inst2 (
+sram # (parameter ADDR_WIDTH = 6, DATA_WIDTH = 12, DEPTH = 64) sram_inst2 (
     .i_clk(clk),
     .i_addr(inputAddr),
     .i_write(i_write),
