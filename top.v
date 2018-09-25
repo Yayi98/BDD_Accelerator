@@ -1,92 +1,94 @@
 module top (a1,a2,a3,a4,a5, Output,clk);
 
-input a1[7:0];
-input a2[7:0];
-input a3[7:0];
-input a4[7:0];
-input a5[7:0];
-input clk;
-
-output Output;
+input wire a1[7:0];
+input wire a2[7:0];
+input wire a3[7:0];
+input wire a4[7:0];
+input wire a5[7:0];
+input wire clk;
+output reg Output;
 
 reg [7:0] cAdd;
 reg q;
 reg na;
 reg c;          //class flag
+reg [5:0] inputAddr;
+reg i_write;
 
 
-BRAM_TDP_MACRO_inst coef(
-.DOA(DOA_f),//Outputport-Adata,widthdefinedbyREAD_WIDTH_Aparameter
-.DOB(DOB),//Outputport-Bdata,widthdefinedbyREAD_WIDTH_Bparameter
-.ADDRA(ADDRA),//Inputport-Aaddress,widthdefinedbyPortAdepth
-.ADDRB(ADDRB),//Inputport-Baddress,widthdefinedbyPortBdepth
-.CLKA(clk),//1-bitinputport-Aclock
-.CLKB(clk),//1-bitinputport-Bclock
-.DIA(DIA),//Inputport-Adata,widthdefinedbyWRITE_WIDTH_Aparameter
-.DIB(DIB),//Inputport-Bdata,widthdefinedbyWRITE_WIDTH_Bparameter
-.ENA(ENA),//1-bitinputport-Aenable
-.ENB(ENB),//1-bitinputport-Benable
-.REGCEA(REGCEA),//1-bitinputport-Aoutputregisterenable
-.REGCEB(REGCEB),//1-bitinputport-Boutputregisterenable
-.RSTA(RSTA),//1-bitinputport-Areset
-.RSTB(RSTB),//1-bitinputport-Breset
-.WEA(WEA),//Inputport-Awriteenable,widthdefinedbyPortAdepth
-.WEB(WEB)//Inputport-Bwriteenable,widthdefinedbyPortBdepth
-);
 
-BRAM_TDP_MACRO_inst child(
-.DOA(DOA_c),//Outputport-Adata,widthdefinedbyREAD_WIDTH_Aparameter
-.DOB(DOB),//Outputport-Bdata,widthdefinedbyREAD_WIDTH_Bparameter
-.ADDRA(ADDRA),//Inputport-Aaddress,widthdefinedbyPortAdepth
-.ADDRB(ADDRB),//Inputport-Baddress,widthdefinedbyPortBdepth
-.CLKA(clk),//1-bitinputport-Aclock
-.CLKB(clk),//1-bitinputport-Bclock
-.DIA(DIA),//Inputport-Adata,widthdefinedbyWRITE_WIDTH_Aparameter
-.DIB(DIB),//Inputport-Bdata,widthdefinedbyWRITE_WIDTH_Bparameter
-.ENA(ENA),//1-bitinputport-Aenable
-.ENB(ENB),//1-bitinputport-Benable
-.REGCEA(REGCEA),//1-bitinputport-Aoutputregisterenable
-.REGCEB(REGCEB),//1-bitinputport-Boutputregisterenable
-.RSTA(RSTA),//1-bitinputport-Areset
-.RSTB(RSTB),//1-bitinputport-Breset
-.WEA(WEA),//Inputport-Awriteenable,widthdefinedbyPortAdepth
-.WEB(WEB)//Inputport-Bwriteenable,widthdefinedbyPortBdepth
-);
+// BRAM_TDP_MACRO_inst coef(
+// .DOA(DOA_f),//Outputport-Adata,widthdefinedbyREAD_WIDTH_Aparameter
+// .DOB(DOB),//Outputport-Bdata,widthdefinedbyREAD_WIDTH_Bparameter
+// .ADDRA(ADDRA),//Inputport-Aaddress,widthdefinedbyPortAdepth
+// .ADDRB(ADDRB),//Inputport-Baddress,widthdefinedbyPortBdepth
+// .CLKA(clk),//1-bitinputport-Aclock
+// .CLKB(clk),//1-bitinputport-Bclock
+// .DIA(DIA),//Inputport-Adata,widthdefinedbyWRITE_WIDTH_Aparameter
+// .DIB(DIB),//Inputport-Bdata,widthdefinedbyWRITE_WIDTH_Bparameter
+// .ENA(ENA),//1-bitinputport-Aenable
+// .ENB(ENB),//1-bitinputport-Benable
+// .REGCEA(REGCEA),//1-bitinputport-Aoutputregisterenable
+// .REGCEB(REGCEB),//1-bitinputport-Boutputregisterenable
+// .RSTA(RSTA),//1-bitinputport-Areset
+// .RSTB(RSTB),//1-bitinputport-Breset
+// .WEA(WEA),//Inputport-Awriteenable,widthdefinedbyPortAdepth
+// .WEB(WEB)//Inputport-Bwriteenable,widthdefinedbyPortBdepth
+// );
 
-ADDMACC_MACRO_inst w(
-.PRODUCT(PRODUCT),//MACCresultoutput,widthdefinedbyWIDTH_PRODUCTparameter
-.CARRYIN(CARRYIN),//1-bitcarry-ininput
-.CLK(CLK),
-//1-bitclockinput
-.CE(CE),
-//1-bitclockenableinput
-.LOAD(LOAD),
-//1-bitaccumulatorloadinput
-.LOAD_DATA(LOAD_DATA),//Accumulatorloaddatainput,widthdefinedbyWIDTH_PRODUCTparameter
-.MULTIPLIER(MULTIPLIER),//Multiplierdatainput,widthdefinedbyWIDTH_MULTIPLIERparameter
-.PREADD2(PREADD2),//Preadderdatainput,widthdefinedbyWIDTH_PREADDparameter
-.PREADD1(PREADD1),//Preadderdatainput,widthdefinedbyWIDTH_PREADDparameter
-.RST(RST)
-//1-bitactivehighsynchronousreset
-);
+// BRAM_TDP_MACRO_inst child(
+// .DOA(DOA_c),//Outputport-Adata,widthdefinedbyREAD_WIDTH_Aparameter
+// .DOB(DOB),//Outputport-Bdata,widthdefinedbyREAD_WIDTH_Bparameter
+// .ADDRA(ADDRA),//Inputport-Aaddress,widthdefinedbyPortAdepth
+// .ADDRB(ADDRB),//Inputport-Baddress,widthdefinedbyPortBdepth
+// .CLKA(clk),//1-bitinputport-Aclock
+// .CLKB(clk),//1-bitinputport-Bclock
+// .DIA(DIA),//Inputport-Adata,widthdefinedbyWRITE_WIDTH_Aparameter
+// .DIB(DIB),//Inputport-Bdata,widthdefinedbyWRITE_WIDTH_Bparameter
+// .ENA(ENA),//1-bitinputport-Aenable
+// .ENB(ENB),//1-bitinputport-Benable
+// .REGCEA(REGCEA),//1-bitinputport-Aoutputregisterenable
+// .REGCEB(REGCEB),//1-bitinputport-Boutputregisterenable
+// .RSTA(RSTA),//1-bitinputport-Areset
+// .RSTB(RSTB),//1-bitinputport-Breset
+// .WEA(WEA),//Inputport-Awriteenable,widthdefinedbyPortAdepth
+// .WEB(WEB)//Inputport-Bwriteenable,widthdefinedbyPortBdepth
+// );
+
+// ADDMACC_MACRO_inst w(
+// .PRODUCT(PRODUCT),//MACCresultoutput,widthdefinedbyWIDTH_PRODUCTparameter
+// .CARRYIN(CARRYIN),//1-bitcarry-ininput
+// .CLK(CLK),
+// //1-bitclockinput
+// .CE(CE),
+// //1-bitclockenableinput
+// .LOAD(LOAD),
+// //1-bitaccumulatorloadinput
+// .LOAD_DATA(LOAD_DATA),//Accumulatorloaddatainput,widthdefinedbyWIDTH_PRODUCTparameter
+// .MULTIPLIER(MULTIPLIER),//Multiplierdatainput,widthdefinedbyWIDTH_MULTIPLIERparameter
+// .PREADD2(PREADD2),//Preadderdatainput,widthdefinedbyWIDTH_PREADDparameter
+// .PREADD1(PREADD1),//Preadderdatainput,widthdefinedbyWIDTH_PREADDparameter
+// .RST(RST)
+// //1-bitactivehighsynchronousreset
+// );
 
 
-ADDMACC_MACRO_inst mac(
-.PRODUCT(PRODUCT),//MACCresultoutput,widthdefinedbyWIDTH_PRODUCTparameter
-.CARRYIN(CARRYIN),//1-bitcarry-ininput
-.CLK(CLK),
-//1-bitclockinput
-.CE(CE),
-//1-bitclockenableinput
-.LOAD(LOAD),
-//1-bitaccumulatorloadinput
-.LOAD_DATA(LOAD_DATA),//Accumulatorloaddatainput,widthdefinedbyWIDTH_PRODUCTparameter
-.MULTIPLIER(MULTIPLIER),//Multiplierdatainput,widthdefinedbyWIDTH_MULTIPLIERparameter
-.PREADD2(PREADD2),//Preadderdatainput,widthdefinedbyWIDTH_PREADDparameter
-.PREADD1(PREADD1),//Preadderdatainput,widthdefinedbyWIDTH_PREADDparameter
-.RST(RST)
-//1-bitactivehighsynchronousreset
-);
+// ADDMACC_MACRO_inst mac(
+// .PRODUCT(PRODUCT),//MACCresultoutput,widthdefinedbyWIDTH_PRODUCTparameter
+// .CARRYIN(CARRYIN),//1-bitcarry-ininput
+// .CLK(CLK),
+// //1-bitclockinput
+// .CE(CE),
+// //1-bitclockenableinput
+// .LOAD(LOAD),
+// //1-bitaccumulatorloadinput
+// .LOAD_DATA(LOAD_DATA),//Accumulatorloaddatainput,widthdefinedbyWIDTH_PRODUCTparameter
+// .MULTIPLIER(MULTIPLIER),//Multiplierdatainput,widthdefinedbyWIDTH_MULTIPLIERparameter
+// .PREADD2(PREADD2),//Preadderdatainput,widthdefinedbyWIDTH_PREADDparameter
+// .PREADD1(PREADD1),//Preadderdatainput,widthdefinedbyWIDTH_PREADDparameter
+// .RST(RST)
+// //1-bitactivehighsynchronousreset
+// );
 assign ENA= 1b'1;
 assign na=0;
 always@(posedge clk)
@@ -114,8 +116,21 @@ begin
      end
 end
 
+sram # (parameter ADDR_WIDTH = 6, DATA_WIDTH = 56, DEPTH = 64) sram_inst1 (
+    .i_clk(clk),
+    .i_addr(inputAddr),
+    .i_write(i_write),
+    .i_data(),
+    .o_data()
+);
 
-
+sram # (parameter ADDR_WIDTH = 6, DATA_WIDTH = 6, DEPTH = 64) sram_inst2 (
+    .i_clk(clk),
+    .i_addr(inputAddr),
+    .i_write(i_write),
+    .i_data(),
+    .o_data()
+);
 
 
 endmodule // top
