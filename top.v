@@ -17,7 +17,7 @@ reg [15:0] c6;
 
 
 
-    sram # (parameter ADDR_WIDTH = 6, DATA_WIDTH = 48, DEPTH = 64) sram_inst1 (
+    sram # (.ADDR_WIDTH(6), .DATA_WIDTH(48), .DEPTH(64)) sram_inst1 (
     .i_clk(clk),
     .i_addr(inputAddr),
     .i_write(i_write1),
@@ -25,12 +25,12 @@ reg [15:0] c6;
     .o_data(coeff)
 );
 
-    sram # (parameter ADDR_WIDTH = 6, DATA_WIDTH = 18, DEPTH = 64) sram_inst2 (
+    sram # (.ADDR_WIDTH(6), DATA_WIDTH(18), .DEPTH(64)) sram_inst2 (
     .i_clk(clk),
     .i_addr(inputAddr),
     .i_write(i_write2),
     .i_da(),
-        .o_da(child)
+    .o_da(child)
 );
     mac mac_inst(.c1(c1),.c2(c2),.c3(c3),.c4(c4),.c5(c5),.c6(c6), .A1(a1),.A2(a2),.A1(a1),
                  .A2(a2),.A3(a3),.A4(a4),.A5(a5), .Output(t), clk(clk));
@@ -40,12 +40,12 @@ reg [15:0] c6;
 always@(posedge clk)
 
 begin
-  
+
 if (~c)
-begin 
+begin
     inputAddr=na[7:0];
-    c1=coeff[47:40];c2=coeff[39:32];c3=coeff[31:24];c4=coeff[23:16];c5=coeff[15:8];c6=coeff[7:0] 
-  
+    c1=coeff[47:40];c2=coeff[39:32];c3=coeff[31:24];c4=coeff[23:16];c5=coeff[15:8];c6=coeff[7:0]
+
   if  (t < c6)
     begin
         assign na=child[17:9];  //child address including the chld or class bit, so total 11+1=12 bits
@@ -67,10 +67,10 @@ end
 
 endmodule // top
 
-    
-    
-    
-    
+
+
+
+
     // BRAM_TDP_MACRO_inst coef(
 // .DOA(DOA_f),//Outputport-Adata,widthdefinedbyREAD_WIDTH_Aparameter
 // .DOB(DOB),//Outputport-Bdata,widthdefinedbyREAD_WIDTH_Bparameter
