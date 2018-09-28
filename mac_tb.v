@@ -3,8 +3,8 @@ module mac_tb();
     reg clk;
     reg [15:0] Output;
 
-    mac DUT (.c1(c1),.c2(c2),.c3(c3),.c4(c4),.c5(c5),.c6(c6), .A1(a1),.A2(a2),.A1(a1),
-                 .A2(a2),.A3(a3),.A4(a4),.A5(a5), .Output(t), clk(clk));
+    mac DUT (A1,A2,A3,A4,A5,c1,c2,c3,c4,c5,Output,clk);
+
     initial begin
         A1 = 8'd1;
         A2 = 8'd1;
@@ -20,8 +20,7 @@ module mac_tb();
         Output = 16'b0000000000000000;
     end
 
-    always()
-    begin
+    always @(*) begin
         #10 clk = ~clk;
     end
 endmodule

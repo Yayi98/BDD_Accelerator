@@ -1,4 +1,4 @@
-module top (A1,A2,A3,A4,A5,c1,c2,c3,c4,c5,Output,clk);
+module mac (A1,A2,A3,A4,A5,c1,c2,c3,c4,c5,Output,clk);
 
 input wire [7:0] A1;
 input wire [7:0] A2;
