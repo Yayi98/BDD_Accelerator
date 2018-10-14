@@ -10,7 +10,8 @@ reg[7:0] a,b;
 reg[7:0] na =8'b00000000;;      //next address/class
 reg c =1'b0;          //class flag
 reg [7:0] c1,c2,c3,c4;
-reg [15:0] c6;
+reg [15:0] t;
+reg count;
 
 
 
@@ -42,16 +43,28 @@ while (c==0) begin
 
 
 begin
-
+    count=0;
     inputAddr=na[7:0];
     c1=coeff[32:24];c2=coeff[23:16];c3=coeff[15:8];c4=coeff[7:0];
     always @ (clk) begin
-      a = 
+      if (count==0) begin
+      rst=1;
+      a = c1; b=a[23:16];
+      rst=0;
+      count= count+1;
+      end
+      if (count==1) begin
+      a = c2; b=a[15:8];
+      count= count+1;
+      if (count==2) begin
+      a = c3; b=a[7:0];
+      t=acc;
+      count= 0;
     end
 
 
 
-  if  (acc < c4)
+  if  (t < c4)
     begin
         assign na=child[17:9];  //child address including the chld or class bit, so total 11+1=12 bits
     end
