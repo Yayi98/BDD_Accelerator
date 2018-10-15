@@ -11,6 +11,7 @@ module macunit(a, b, clk,rst, acc);
     always @(clk,rst) begin
         if(rst==1'b1) begin
             regg=0;
+            sum=0;
         end
         else begin
             regg=sum;

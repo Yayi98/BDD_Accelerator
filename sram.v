@@ -1,8 +1,7 @@
-module sram #(parameter ADDR_WIDTH = 6, DATA_WIDTH = 8, DEPTH = 64) (
+module sram #(parameter ADDR_WIDTH = 4, DATA_WIDTH = 32, DEPTH = 32) (
     input wire i_clk,
     input wire [ADDR_WIDTH-1:0] i_addr,
     input wire i_write,
-    input wire i_read,
     input wire [DATA_WIDTH-1:0] i_data,
     output reg [DATA_WIDTH-1:0] o_data
     );
@@ -16,10 +15,7 @@ module sram #(parameter ADDR_WIDTH = 6, DATA_WIDTH = 8, DEPTH = 64) (
             memory_array[i_addr] <= i_data;
         end
         else begin
-            if(i_read)
-            begin
-                o_data <= memory_array[i_addr];
-            end
+            o_data <= memory_array[i_addr];
         end
     end
 endmodule

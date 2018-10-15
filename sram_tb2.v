@@ -10,26 +10,26 @@ module sram_basic_testbench();
     wire [DATA_WIDTH-1:0] data_out;
 
     initial begin
-        $display("sram test bench");
+        $display("sram test bench 2");
         clk = 1;
 
         #10 write_enable = 1;
         address = 0;
-        data_in = 32'd1002.45;
-        #10 address = 1;
-        data_in = 101.75;
-        #10 address = 2;
-        data_in = 1004.95;
-        #10 address = 3;
-        data_in = 1004.85;
-        #10 address = 4;
-        data_in = 101.65;
-        #10 address = 5;
-        data_in = 101.55;
-        #10 address = 6;
-        data_in = 15.95;
-        #10 address = 7;
-        data_in = 16.95;
+        data_in = 18'b100000000000000001;
+        address = 1;
+        data_in = 18'b000000010000000011;
+        address = 2;
+        data_in = 18'b000000100000000101;
+        address = 3;
+        data_in = 18'b000000110100000001;
+        address = 4;
+        data_in = 18'b100000001100000010;
+        address = 5;
+        data_in = 18'b100000010000000111;
+        address = 6;
+        data_in = 18'b100000001100000011;
+        address = 7;
+        data_in = 18'b100000001100000011;
 
         #10 write_enable = 0;
         #10 address = 0;
