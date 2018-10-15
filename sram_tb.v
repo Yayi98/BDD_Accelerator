@@ -15,7 +15,7 @@ module sram_basic_testbench();
 
         #10 write_enable = 1;
         address = 0;
-        data_in = 32'd1002.45;
+        data_in = {8'b00000001,8'b00000000,8'b00000000,2.45};
         #10 address = 1;
         data_in = 101.75;
         #10 address = 2;

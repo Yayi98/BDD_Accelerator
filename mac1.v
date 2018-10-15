@@ -1,4 +1,4 @@
-module macunit(a, b, clk,rst, acc);
+module macunit (a, b, clk,rst, acc);
     input wire [7:0] a;
     input wire [7:0] b;
     input wire clk,rst;
