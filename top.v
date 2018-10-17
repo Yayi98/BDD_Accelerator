@@ -1,13 +1,14 @@
-module top #(RAM1_DATA_WIDTH = 32, RAM2_DATA_WIDTH = 16, ADDR_WIDTH = 4, DEPTH = 32) (a, Output,clk);
+module top #(RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 16, ADDR_WIDTH = 4, DEPTH = 32) (a, Output,clk);
 
     //Mac1 and sram inputs
 
-    input wire [7:0] ip_attr;
-    input wire clk, rst, we, i_write;
+    input wire [7:0] in_attr;
+    input wire clk, rst, we1, we2, i_write;
     input wire [31:0] ram_1_data_in;
     input wire [ADDR_WIDTH-1:0] in_addr;
     input wire [RAM1_DATA_WIDTH-1:0] ram1_data_in;
     input wire [RAM2_DATA_WIDTH-1:0] ram2_data_in;
+    output reg [7:0] out_class;
 
     //Mac1 output
     reg [15:0] mac_acc;
@@ -15,8 +16,28 @@ module top #(RAM1_DATA_WIDTH = 32, RAM2_DATA_WIDTH = 16, ADDR_WIDTH = 4, DEPTH =
     reg ram1clk;
     reg ram2clk;
     //Ram1 and Ram2 outputs
-    reg [RAM1_DATA_WIDTH-1:0 ram1reg;
+    reg [RAM1_DATA_WIDTH-1:0] ram1reg;
     reg [RAM2_DATA_WIDTH-1:0] ram2reg;
+
+    // reg [7:0] ram1_8bit_reg;
+    // reg [7:0] ram2_8bit_reg;
+    reg [9:0] ram1_10bit_reg;
+    reg [8:0] ram2_9bit_reg;
+    reg [2:0] counter;
+    reg [7:0] next_addr;
+
+    initial begin
+        mac_acc = 16'b0000000000000000;
+        ram1clk = 1'b0;
+        ram2clk = 1'b0;
+        ram1reg = 0;
+        ram2reg = 0;
+        // ram1_8bit_reg = 8'b00000000;
+        // ram2_8bit_reg = 8'b00000000;
+        ram1_10bit_reg = 10'b0000000000;
+        ram2_9bit_reg = 9'b000000000;
+        counter = 3'b000;
+    end
 
     //Instantiate clkdiv to reduce clkfreq by 4 times for Ram1 and to half the clkfreq for RAM2_DATA_WIDTH
     //So total 2 clkdiv modules
@@ -30,9 +51,72 @@ module top #(RAM1_DATA_WIDTH = 32, RAM2_DATA_WIDTH = 16, ADDR_WIDTH = 4, DEPTH =
         .clock_out(ram2clk)
         );
 
-    
+    sram #(.ADDR_WIDTH(ADDR_WIDTH), .DATA_WIDTH(RAM1_DATA_WIDTH), .DEPTH(DEPTH)) sram_inst1 (
+        .i_clk(ram1clk),
+        .i_addr(next_addr),
+        .i_write(we1),
+        .rst(rst),
+        .i_data(ram1_data_in),
+        .o_data(ram1reg)
+        );
 
+    sram #(.ADDR_WIDTH(ADDR_WIDTH), .DATA_WIDTH(RAM2_DATA_WIDTH), .DEPTH(DEPTH)) sram_inst2 (
+        .i_clk(ram2clk),
+        .i_addr(next_addr),
+        .i_write(we2),
+        .rst(rst),
+        .i_data(ram2_data_in),
+        .o_data(ram2reg)
+        );
 
+    mac1 mac_inst (
+        .a(in_attr),
+        .b(ram1_10bit_reg),
+        .clk(clk),
+        .rst(rst)
+        .acc(mac_acc)
+        );
+
+    always @(clk,rst) begin
+        if(posedge clk) begin
+            if(counter>3'b100) begin
+                counter <= 3'b000;
+            end else begin
+                counter <= counter + 3'b001;
+            end
+        end
+
+        case(counter)
+            3'b000 : ram1_10bit_reg <= ram1reg[RAM1_DATA_WIDTH-1:RAM1_DATA_WIDTH-8];
+            3'b001 : ram1_10bit_reg <= ram1reg[RAM1_DATA_WIDTH-9:RAM1_DATA_WIDTH-16];
+            3'b010 : ram1_10bit_reg <= ram1reg[RAM1_DATA_WIDTH-17:RAM1_DATA_WIDTH-24];
+            3'b011 : ram1_10bit_reg <= ram1reg[RAM1_DATA_WIDTH-25:RAM1_DATA_WIDTH-34];
+            default : ram1_10bit_reg <= 8'bx;
+        endcase
+
+        if(counter=3'b011) begin
+            if(macc_acc<=ram1_10bit_reg) begin
+                ram2_9bit_reg <= ram2reg[RAM2_DATA_WIDTH-1:RAM2_DATA_WIDTH-9];
+                if(ram2_9bit_reg[RAM2_DATA_WIDTH-1] = 1'b1) begin
+                    out_class <= ram2_9bit_reg[RAM2_DATA_WIDTH-2:RAM2_DATA_WIDTH-9];
+                    next_addr <= 8'b00000000;
+                end else begin
+                    next_addr <= ram2_9bit_reg[RAM2_DATA_WIDTH-2:RAM2_DATA_WIDTH-9];
+                    out_class <= 8'b00000000;
+                end
+            end else begin
+                ram2_9bit_reg <= ram2reg[RAM2_DATA_WIDTH-10:0];
+                if(ram2_9bit_reg[RAM2_DATA_WIDTH-10] = 1'b1) begin
+                    out_class <= ram2_9bit_reg[RAM2_DATA_WIDTH-11:0];
+                    next_addr <= 8'b00000000;
+                end else begin
+                    next_addr <= ram2_9bit_reg[RAM2_DATA_WIDTH-11:0];
+                    out_class <= 8'b00000000;
+                end
+            end
+        end
+    end
+endmodule
 
 
 
@@ -72,31 +156,6 @@ module top #(RAM1_DATA_WIDTH = 32, RAM2_DATA_WIDTH = 16, ADDR_WIDTH = 4, DEPTH =
 // reg [7:0] c1,c2,c3,c4;
 // reg [15:0] t;
 // reg count;
-//
-//
-//
-//     sram1  sram_node (
-//     .i_clk(clk),
-//     .i_addr(node_addr),
-//     .i_write(i_write),
-//     .i_data(i_data),
-//     .o_data(coeff)
-// );
-//
-//     sram2  sram_child (
-//     .i_clk(clk),
-//     .i_addr(inputAddr),
-//     .i_write(i_write),
-//     .i_da(i_data),
-//     .o_da(child)
-// );
-//     mac1 mac_i(.a(a),.b(b),.c3(c3),.rst(rst), .acc(acc) clk(clk));
-//
-//
-// assign i_write=0;
-// assign i_data=1;
-//
-//
 // //always@(a)
 // //c=0;
 // while (c==0) begin

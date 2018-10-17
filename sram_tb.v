@@ -1,6 +1,6 @@
 module sram_basic_testbench();
     parameter ADDR_WIDTH = 4;
-    parameter DATA_WIDTH = 32;
+    parameter DATA_WIDTH = 34;
     parameter DEPTH = 32;
 
     reg clk;
@@ -15,21 +15,21 @@ module sram_basic_testbench();
 
         #10 write_enable = 1;
         address = 0;
-        data_in = {8'b00000001,8'b00000000,8'b00000000,2.45};
+        data_in = {8'd100,8'd0,8'd0,10'd245};
         #10 address = 1;
-        data_in = 101.75;
+        data_in = {8'd0,8'd100,8'd0,10'd175};
         #10 address = 2;
-        data_in = 1004.95;
+        data_in = {8'd100,8'd0,8'd0,10'd495};
         #10 address = 3;
-        data_in = 1004.85;
+        data_in = {8'd100,8'd0,8'd0,10'd485};
         #10 address = 4;
-        data_in = 101.65;
+        data_in = {8'd0,8'd100,8'd0,10'd165};
         #10 address = 5;
-        data_in = 101.55;
+        data_in = {8'd0,8'd100,8'd0,10'd155};
         #10 address = 6;
-        data_in = 15.95;
+        data_in = {8'd0,8'd0,8'd100,10'd595};
         #10 address = 7;
-        data_in = 16.95;
+        data_in = {8'd0,8'd0,8'd100,10'd695};
 
         #10 write_enable = 0;
         #10 address = 0;
