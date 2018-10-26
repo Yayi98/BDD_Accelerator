@@ -32,8 +32,10 @@ module top #(RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 16, ADDR_WIDTH = 4, DEPTH =
     wire [RAM1_DATA_WIDTH-1:0] ram1wire;
     wire [RAM2_DATA_WIDTH-1:0] ram2wire;
     wire [15:0] mac_acc_wire;
+	
     //Instantiate clkdiv to reduce clkfreq by 4 times for Ram1 and to half the clkfreq for RAM2_DATA_WIDTH
     //So total 2 clkdiv modules
+	
     clkdiv #(.DIVISOR(4)) clkdivram1 (
         .clock_in(clk),
         .clock_out(ram1clk)
@@ -69,7 +71,7 @@ module top #(RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 16, ADDR_WIDTH = 4, DEPTH =
         .rst(rst),
         .acc(mac_acc_wire)
         );
-	always @(posedge clk) begin
+    always @(posedge clk) begin
 
 	mac_acc = mac_acc_wire;
 	ram1_10bit_reg = ram1_10bit_wire;
@@ -91,36 +93,36 @@ module top #(RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 16, ADDR_WIDTH = 4, DEPTH =
 	    rst= 1'b0;
 	end
 
-        case(counter)
-            3'b000 : ram1_10bit_reg = ram1reg[RAM1_DATA_WIDTH-1:RAM1_DATA_WIDTH-8];
-            3'b001 : ram1_10bit_reg = ram1reg[RAM1_DATA_WIDTH-9:RAM1_DATA_WIDTH-16];
-            3'b010 : ram1_10bit_reg = ram1reg[RAM1_DATA_WIDTH-17:RAM1_DATA_WIDTH-24];
-            3'b011 : ram1_10bit_reg = ram1reg[RAM1_DATA_WIDTH-25:RAM1_DATA_WIDTH-34];
-            default : ram1_10bit_reg = 8'bx;
-        endcase
+	case(counter)
+	    3'b000 : ram1_10bit_reg = ram1reg[RAM1_DATA_WIDTH-1:RAM1_DATA_WIDTH-8];
+	    3'b001 : ram1_10bit_reg = ram1reg[RAM1_DATA_WIDTH-9:RAM1_DATA_WIDTH-16];
+	    3'b010 : ram1_10bit_reg = ram1reg[RAM1_DATA_WIDTH-17:RAM1_DATA_WIDTH-24];
+	    3'b011 : ram1_10bit_reg = ram1reg[RAM1_DATA_WIDTH-25:RAM1_DATA_WIDTH-34];
+	    default : ram1_10bit_reg = 8'bx;
+	endcase
 
 
 
-        if(counter==3'b011) begin
-            if(mac_acc<=ram1_10bit_reg) begin
-                ram2_9bit_reg = ram2reg[RAM2_DATA_WIDTH-1:RAM2_DATA_WIDTH-9];
-                if(ram2_9bit_reg[8] == 1'b1) begin
-                    out_class = ram2_9bit_reg[7:0];
-                    next_addr = 8'b00000000;
-                end else begin
-                    next_addr = ram2_9bit_reg[7:0];
-                    out_class = 8'b00000000;
-                end
-            end else begin
-                ram2_9bit_reg = ram2reg[RAM2_DATA_WIDTH-10:0];
-                if(ram2_9bit_reg[RAM2_DATA_WIDTH-10] == 1'b1) begin
-                    out_class = ram2_9bit_reg[7:0];
-                    next_addr = 8'b00000000;
-                end else begin
-                    next_addr = ram2_9bit_reg[7:0];
-                    out_class = 8'b00000000;
-                end
-            end
-        end
+	if(counter==3'b011) begin
+	    if(mac_acc<=ram1_10bit_reg) begin
+		ram2_9bit_reg = ram2reg[RAM2_DATA_WIDTH-1:RAM2_DATA_WIDTH-9];
+		if(ram2_9bit_reg[8] == 1'b1) begin
+		    out_class = ram2_9bit_reg[7:0];
+		    next_addr = 8'b00000000;
+		end else begin
+		    next_addr = ram2_9bit_reg[7:0];
+		    out_class = 8'b00000000;
+		end
+	    end else begin
+		ram2_9bit_reg = ram2reg[RAM2_DATA_WIDTH-10:0];
+		if(ram2_9bit_reg[RAM2_DATA_WIDTH-10] == 1'b1) begin
+		    out_class = ram2_9bit_reg[7:0];
+		    next_addr = 8'b00000000;
+		end else begin
+		    next_addr = ram2_9bit_reg[7:0];
+		    out_class = 8'b00000000;
+		end
+	    end
+	end
     end
 endmodule
