@@ -12,9 +12,9 @@ module sram #(parameter ADDR_WIDTH = 4, DATA_WIDTH = 32, DEPTH = 32) (
 
     //rst and we have to be held high for "DEPTH" number of clk cycles to reset the ram
 
-    always @ (i_clk, rst)
-    counter <= counter + 1;
-    begin
+    always @ (i_clk, rst) begin
+        counter <= counter + 1;
+
         if(~rst) begin
             if(i_write)
             begin
