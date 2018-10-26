@@ -8,8 +8,7 @@ module top #(RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 16, ADDR_WIDTH = 4, DEPTH =
     input wire [RAM1_DATA_WIDTH-1:0] ram1_data_in;
     input wire [RAM2_DATA_WIDTH-1:0] ram2_data_in;
     output reg [7:0] out_class;
-
-	reg rst = 0;
+    reg rst = 1'b0;
 
     //Mac1 output
     reg [15:0] mac_acc;
@@ -22,7 +21,7 @@ module top #(RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 16, ADDR_WIDTH = 4, DEPTH =
 
     // reg [7:0] ram1_8bit_reg;
     // reg [7:0] ram2_8bit_reg;
-	reg [9:0] ram1_10bit_reg;
+    reg [9:0] ram1_10bit_reg;
     reg [8:0] ram2_9bit_reg;
     reg [2:0] counter;
     reg [7:0] next_addr;
@@ -30,7 +29,7 @@ module top #(RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 16, ADDR_WIDTH = 4, DEPTH =
     wire [9:0] ram1_10bit_wire;
     wire [8:0] ram2_9bit_wire;
     wire [7:0] next_addr_wire;
-	wire [RAM1_DATA_WIDTH-1:0] ram1wire;
+    wire [RAM1_DATA_WIDTH-1:0] ram1wire;
     wire [RAM2_DATA_WIDTH-1:0] ram2wire;
     wire [15:0] mac_acc_wire;
     //Instantiate clkdiv to reduce clkfreq by 4 times for Ram1 and to half the clkfreq for RAM2_DATA_WIDTH
@@ -70,28 +69,27 @@ module top #(RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 16, ADDR_WIDTH = 4, DEPTH =
         .rst(rst),
         .acc(mac_acc_wire)
         );
-    always @(clk) begin
+	always @(posedge clk) begin
 
-		mac_acc = mac_acc_wire;
-		ram1_10bit_reg = ram1_10bit_wire;
-		ram2_9bit_reg = ram2_9bit_wire;
-	    next_addr = next_addr_wire;
-		ram1reg = ram1wire;
-		ram2reg = ram2wire;
+	mac_acc = mac_acc_wire;
+	ram1_10bit_reg = ram1_10bit_wire;
+	ram2_9bit_reg = ram2_9bit_wire;
+	next_addr = next_addr_wire;
+	ram1reg = ram1wire;
+	ram2reg = ram2wire;
 
-        if( clk==1) begin        //check
-            if(counter>3'b100) begin
-                counter <= 3'b000;
-            end else begin
-                counter <= counter + 3'b001;
-            end
-        end
 
-		if (counter==3'b011) begin
-		    rst= 1'b1;
-		end else begin
-		    rst= 1'b0;
-		end
+	if(counter>3'b100) begin
+	    counter <= 3'b000;
+	end else begin
+	    counter <= counter + 3'b001;
+	end
+
+	if (counter==3'b011) begin
+	    rst= 1'b1;
+	end else begin
+	    rst= 1'b0;
+	end
 
         case(counter)
             3'b000 : ram1_10bit_reg = ram1reg[RAM1_DATA_WIDTH-1:RAM1_DATA_WIDTH-8];
