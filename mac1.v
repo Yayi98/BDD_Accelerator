@@ -1,4 +1,4 @@
-module mac1 (a, b, clk,rst, acc);
+module mac1 (a, b, clk, rst, acc);
     input wire [9:0] a;
     input wire [9:0] b;
     input wire clk,rst;
@@ -9,12 +9,13 @@ module mac1 (a, b, clk,rst, acc);
         if(rst==1'b1) begin
             regg = 0;
             sum = 0;
-        end
-        else begin
+        end else begin
             regg = sum;
         end
+
         prod = a*b;
         sum = prod+regg;
 	    acc = sum;
+
     end
 endmodule

@@ -46,11 +46,12 @@ module sram_basic_testbench();
         #5 clk = ~clk;  // timescale is 1ns so #5 provides 100MHz clock
     end
 
-    sram DUT (
+    sram #(.ADDR_WIDTH(ADDR_WIDTH), .DATA_WIDTH(RAM2_DATA_WIDTH), .DEPTH(DEPTH)) DUT (
         .i_clk(clk),
         .i_addr(address),
         .i_write(write_enable),
         .i_data(data_in),
-        .o_data(data_out));
+        .o_data(data_out)
+    );
 
 endmodule
