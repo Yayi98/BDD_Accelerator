@@ -74,7 +74,7 @@ module top #(RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 18, ADDR_WIDTH = 4, DEPTH =
     assign ram1_10bit_wire = ram1_10bit_reg;
     assign ram2_9bit_wire = ram2_9bit_reg;
     assign next_addr_wire = next_addr;
-    
+
     always @(posedge clk) begin
 
     	mac_acc = mac_acc_wire;
@@ -91,11 +91,7 @@ module top #(RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 18, ADDR_WIDTH = 4, DEPTH =
     	    counter <= counter + 3'b001;
     	end
 
-    	if (counter==3'b011) begin
-    	    rst= 1'b1;
-    	end else begin
-    	    rst= 1'b0;
-    	end
+
 
     	case(counter)
     	    3'b000 : ram1_10bit_reg = ram1reg[RAM1_DATA_WIDTH-1:RAM1_DATA_WIDTH-8];

@@ -41,7 +41,7 @@ module mac1 #(ATTR_WIDTH = 24, RAM1_DATA_WIDTH = 34) (inputattr, inputcoeff, clk
             3'b011 : begin
                         b <= inputcoeffreg[RAM1_DATA_WIDTH-25:RAM1_DATA_WIDTH-34];
                         rst <= 1;
-							end
+					end
 
             default : begin
                         a <= 8'bx;
@@ -61,4 +61,3 @@ module mac1 #(ATTR_WIDTH = 24, RAM1_DATA_WIDTH = 34) (inputattr, inputcoeff, clk
         sum = prod+regg;
 end
 endmodule
-
