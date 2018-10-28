@@ -1,11 +1,11 @@
-module mac1 #(ATTR_WIDTH = 24, RAM2_DATA_WIDTH = 18) (a, b, clk, acc);
+module mac1 #(ATTR_WIDTH = 24, RAM1_DATA_WIDTH = 34) (inputattr, inputcoeff, clk, acc);
     input wire [ATTR_WIDTH-1:0] inputattr;
-    input wire [RAM2_DATA_WIDTH-1:0] inputcoeff;
+    input wire [RAM1_DATA_WIDTH-1:0] inputcoeff;
     input wire clk;
     output reg [19:0] acc;
 
     reg [ATTR_WIDTH-1:0] inputattrreg;
-    reg [RAM2_DATA_WIDTH-1:0] inputcoeffreg;
+    reg [RAM1_DATA_WIDTH-1:0] inputcoeffreg;
     reg [19:0] prod,regg,sum;
     reg [9:0] a, b;
     reg [2:0] counter;
@@ -41,11 +41,12 @@ module mac1 #(ATTR_WIDTH = 24, RAM2_DATA_WIDTH = 18) (a, b, clk, acc);
             3'b011 : begin
                         b <= inputcoeffreg[RAM1_DATA_WIDTH-25:RAM1_DATA_WIDTH-34];
                         rst <= 1;
+							end
 
             default : begin
                         a <= 8'bx;
                         b <= 8'bx;
-                    end
+                      end
         endcase
     end
 
@@ -60,3 +61,4 @@ module mac1 #(ATTR_WIDTH = 24, RAM2_DATA_WIDTH = 18) (a, b, clk, acc);
         sum = prod+regg;
 end
 endmodule
+
