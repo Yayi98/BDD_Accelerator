@@ -1,10 +1,11 @@
 module mac1_tb();
 
-    reg clk, rst;
-    reg [7:0] a,b;
-    wire [15:0] acc;
+    reg [23:0] inputattr;
+    reg [23:0] inputcoeff;
+    reg clk;
+    reg [19:0] acc;
 
-    macunit DUT (.clk(clk), .rst(rst), .a(a), .b(b), .acc(acc));
+    mac1 DUT (.clk(clk), .acc(acc), .inputattr(inputattr), .inputcoeff(inputcoeff));
 
     always @(*) begin
         #20 clk = ~clk;
@@ -12,21 +13,8 @@ module mac1_tb();
 
     initial begin
         clk=1;
-        rst=0;
-        a=0; b=0;
-        rst=1;
-        #20
-        rst=0;
-
-        a=5; b=1; #20
-        a=5; b=2; #20
-        a=5; b=3; #10
-        rst=1;
-        #20
-        rst=0;
-        #20
-        a=4; b=1; #20
-        a=4; b=2; #20
-        a=4; b=3;
+        #20 inputattr=0; inputcoeff=0;
+        #20 inputattr={8'd49,8'd30,8'd14}; inputcoeff={8'd10,8'd0,8'd0};
+        #20 inputattr={8'd47,8'd32,8'd13}; inputcoeff={8'd10,8'd0,8'd0};
     end
 endmodule

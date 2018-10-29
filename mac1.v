@@ -44,7 +44,7 @@ module mac1 #(ATTR_WIDTH = 24, RAM1_DATA_WIDTH = 34) (inputattr, inputcoeff, clk
 					end
 
             default : begin
-                        a <= 8'bx;
+                        inputattrreg <= 8'bx;
                         b <= 8'bx;
                       end
         endcase
@@ -52,12 +52,11 @@ module mac1 #(ATTR_WIDTH = 24, RAM1_DATA_WIDTH = 34) (inputattr, inputcoeff, clk
 
     always @(clk,rst) begin
         if(rst==1'b1) begin
-            regg = 0;
             sum = 0;
         end else begin
             regg = sum;
         end
         prod = a*b;
-        sum = prod+regg;
-end
+        sum = prod+sum;
+    end
 endmodule
