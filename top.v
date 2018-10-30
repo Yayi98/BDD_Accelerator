@@ -1,10 +1,10 @@
 
-module top #(RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 16, ADDR_WIDTH = 4, DEPTH = 32) (in_attr, out_class,clk, we1, we2,rst,in_addr,ram1_data_in,ram2_data_in);
+module top #( parameter RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 16, ADDR_WIDTH = 4, DEPTH = 32) (i,in_attr, out_class,clk, we1, we2,in_addr,ram1_data_in,ram2_data_in);
 
     //Mac1 and sram inputs
 
-    input wire [7:0] in_attr;
-    input wire  clk, we1, we2,rst;
+    input wire [29:0] in_attr;
+    input wire  clk, we1, we2,i;
     input wire [ADDR_WIDTH-1:0] in_addr;
     input wire [RAM1_DATA_WIDTH-1:0] ram1_data_in;
     input wire [RAM2_DATA_WIDTH-1:0] ram2_data_in;
@@ -42,21 +42,18 @@ module top #(RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 16, ADDR_WIDTH = 4, DEPTH =
     //Instantiate clkdiv to reduce clkfreq by 4 times for Ram1 and to half the clkfreq for RAM2_DATA_WIDTH
     //So total 2 clkdiv modules
 	
-    clkdiv #(.DIVISOR(4)) clkdivram1 (
-        .clock_in(clk),
-        .clock_out(ram1clk)
+    clkdiv2 clkdiv  (
+		  .clk(clk),
+        .clk1(ram2clk),
+        .clk2(ram1clk)
         );
 
-    clkdiv #(.DIVISOR(2)) clkdivram2 (
-        .clock_in(clk),
-        .clock_out(ram2clk)
-        );
+  
 
     sram #(.ADDR_WIDTH(ADDR_WIDTH), .DATA_WIDTH(RAM1_DATA_WIDTH), .DEPTH(DEPTH)) sram_inst1 (
         .i_clk(ram1clk),
         .i_addr(next_addr_wire),
         .i_write(we1),
-        .rst(rst),
         .i_data(ram1_data_in),
         .o_data(ram1wire)
         );
@@ -65,7 +62,6 @@ module top #(RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 16, ADDR_WIDTH = 4, DEPTH =
         .i_clk(ram2clk),
         .i_addr(next_addr_wire),
         .i_write(we2),
-        .rst(rst),
         .i_data(ram2_data_in),
         .o_data(ram2wire)
         );
@@ -90,8 +86,13 @@ module top #(RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 16, ADDR_WIDTH = 4, DEPTH =
 //		ram2reg = ram2wire;
 //	end
 //	
-	
+
+
 	always @(posedge clk) begin
+		if (i==1) 
+			next_addr = in_addr;
+		else begin
+	   
 
 
 //		if(counter==3'b011) begin
@@ -114,10 +115,12 @@ module top #(RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 16, ADDR_WIDTH = 4, DEPTH =
 					out_class = 8'b00000000;
 				end
 			end
-//		end
+		end
 	end
 	
-	assign next_addr_wire= next_addr;
+
+	assign next_addr_wire = next_addr;
+		
 //	assign ram2_9bit_wire= ram2_9bit_reg;
 	
 endmodule

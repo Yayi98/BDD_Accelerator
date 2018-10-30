@@ -27,6 +27,7 @@ module top_tb();
     end
 
     initial begin
+        in_attr = {10'd49,10'd30,10'd14};
         clk = 1;
         //Load sram1
         we1 = 1;
@@ -70,10 +71,9 @@ module top_tb();
 
         //Give input attr
 
-        repeat (7) begin
-            #10 in_attr = 10'd49;
-            #10 in_attr = 30;
-            #10 in_attr = 14;
-        end
+
+
+
+
     end
 endmodule

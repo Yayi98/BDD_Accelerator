@@ -1,4 +1,4 @@
-module mac1 #(ATTR_WIDTH = 24, RAM1_DATA_WIDTH = 24) (inputattr, inputcoeff, clk, acc);
+module mac1 #(parameter ATTR_WIDTH = 24, RAM1_DATA_WIDTH = 24) (inputattr, inputcoeff, clk, acc);
     input wire [ATTR_WIDTH-1:0] inputattr;
     input wire [RAM1_DATA_WIDTH-1:0] inputcoeff;
     input wire clk;
