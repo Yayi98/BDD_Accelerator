@@ -9,8 +9,8 @@ module top #( parameter RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 16, ADDR_WIDTH =
     input wire [RAM1_DATA_WIDTH-1:0] ram1_data_in;
     input wire [RAM2_DATA_WIDTH-1:0] ram2_data_in;
     output reg [7:0] out_class;
-	 
-	 
+
+
     //Mac1 output
     reg [15:0] mac_acc;
     //Ram1 and Ram2 inputs
@@ -20,8 +20,8 @@ module top #( parameter RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 16, ADDR_WIDTH =
     reg [RAM1_DATA_WIDTH-1:0] ram1reg;
     reg [RAM2_DATA_WIDTH-1:0] ram2reg;
 
-	 
-	 
+
+
     // reg [7:0] ram1_8bit_reg;
     // reg [7:0] ram2_8bit_reg;
    // reg [9:0] ram1_10bit_reg;
@@ -35,20 +35,20 @@ module top #( parameter RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 16, ADDR_WIDTH =
     wire [RAM1_DATA_WIDTH-1:0] ram1wire;
     wire [RAM2_DATA_WIDTH-1:0] ram2wire;
     wire [15:0] mac_acc_wire;
-	
-	
+
+
 	 reg [7:0] out_class_reg;
-	
+
     //Instantiate clkdiv to reduce clkfreq by 4 times for Ram1 and to half the clkfreq for RAM2_DATA_WIDTH
     //So total 2 clkdiv modules
-	
+
     clkdiv2 clkdiv  (
 		  .clk(clk),
         .clk1(ram2clk),
         .clk2(ram1clk)
         );
 
-  
+
 
     sram #(.ADDR_WIDTH(ADDR_WIDTH), .DATA_WIDTH(RAM1_DATA_WIDTH), .DEPTH(DEPTH)) sram_inst1 (
         .i_clk(ram1clk),
@@ -75,8 +75,8 @@ module top #( parameter RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 16, ADDR_WIDTH =
 
 
 //	assign o_data = o_data_reg;
-	
-	
+
+
 //	always @(posedge clk) begin
 //	//	mac_acc = mac_acc_wire;
 //	//	ram1_10bit_reg = ram1_10bit_wire;
@@ -85,14 +85,14 @@ module top #( parameter RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 16, ADDR_WIDTH =
 //		ram1reg = ram1wire;
 //		ram2reg = ram2wire;
 //	end
-//	
+//
 
 
 	always @(posedge clk) begin
-		if (i==1) 
+		if (i==1'b1) begin
 			next_addr = in_addr;
-		else begin
-	   
+		end else begin
+
 
 
 //		if(counter==3'b011) begin
@@ -117,10 +117,10 @@ module top #( parameter RAM1_DATA_WIDTH = 34, RAM2_DATA_WIDTH = 16, ADDR_WIDTH =
 			end
 		end
 	end
-	
+
 
 	assign next_addr_wire = next_addr;
-		
+
 //	assign ram2_9bit_wire= ram2_9bit_reg;
-	
+
 endmodule
