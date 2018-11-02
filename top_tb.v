@@ -1,11 +1,11 @@
 module top_tb();
     parameter RAM1_DATA_WIDTH = 34;
     parameter RAM2_DATA_WIDTH = 18;
-    parameter ADDR_WIDTH = 4;
+    parameter ADDR_WIDTH = 8;
     parameter DEPTH = 32;
 
     reg [23:0] in_attr;
-    reg clk, we1, we2, rst;
+    reg clk, we1;
     reg [ADDR_WIDTH-1:0] in_addr;
     reg [RAM1_DATA_WIDTH-1:0] ram1_data_in;
     reg [RAM2_DATA_WIDTH-1:0] ram2_data_in;
@@ -15,7 +15,6 @@ module top_tb();
         .in_attr(in_attr),
         .clk(clk),
         .we1(we1),
-        .we2(we2),
         .in_addr(in_addr),
         .ram1_data_in(ram1_data_in),
         .ram2_data_in(ram2_data_in),
@@ -24,10 +23,9 @@ module top_tb();
 
     initial begin
         in_attr = {8'd14,8'd2,8'd49};
-        clk = 1;
+        clk = 1'b1;
         //Load sram1
         we1 = 1;
-        i=1'b1;
         in_addr = 0;
         ram1_data_in = {8'd10,8'd0,8'd0,10'd245};
         #40 in_addr = 1;
@@ -47,9 +45,9 @@ module top_tb();
 
 
         //Load sram2
-        #20 we2 = 1;
+
         in_addr = 0;
-        ram2_data_in = 18'b100000000000000001;
+        ram2_data_in = 18'b100000011000000001;
         #20 in_addr = 1;
         ram2_data_in = 18'b000000010000000011;
         #20 in_addr = 2;
@@ -64,9 +62,8 @@ module top_tb();
         ram2_data_in = 18'b100000001100000011;
         #20 in_addr = 7;
         ram2_data_in = 18'b100000001100000011;
-        we2 = 0;
         we1 = 0;
-        i=1'b0;
+
     end
 
     always begin

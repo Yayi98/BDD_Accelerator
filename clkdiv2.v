@@ -9,7 +9,7 @@ module  clkdiv2 (clk,invclk2,clk2);
          clk1reg = ~clk1reg;
     end
 
-    always @ (posedge clk1) begin
+    always @ (posedge clk1reg) begin
             clk2reg = ~clk2reg;
     end
 
