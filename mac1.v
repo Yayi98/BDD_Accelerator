@@ -1,25 +1,32 @@
-module mac1 #(parameter ATTR_WIDTH = 24, RAM1_DATA_WIDTH = 24) (inputattr, inputcoeff, clk, acc);
+module mac1 #(parameter ATTR_WIDTH = 24, RAM1_DATA_WIDTH = 24) (inputattr, inputcoeff, clk, rst_in, acc);
     input wire [ATTR_WIDTH-1:0] inputattr;
     input wire [RAM1_DATA_WIDTH-1:0] inputcoeff;
-    input wire clk;
+    input wire clk, rst_in;
     output reg [19:0] acc;
 
   //  reg [ATTR_WIDTH-1:0] inputattrreg;
   //  reg [RAM1_DATA_WIDTH-1:0] inputcoeffreg;
     reg [19:0] prod,sum;
-    //reg [19:0] regg;
-    reg [9:0] a, b;
-    reg [2:0] counter = -3'b001;
+    reg  ctr_set;
+    reg [9:0] a,a1,a2,b;
+    reg [1:0] counter = 2'b11; //2s(-1)
     reg rst = 1'b0;
 //    wire [19:0] accwire;
-
 
     always @(posedge clk) begin
 
  //       inputattrreg = inputattr;
  //       inputcoeffreg = inputcoeff;
  //       acc = accwire;
-
+        if(rst_in == 1'b1) begin
+            counter = 2'b00;
+            rst = 1'b1;
+            ctr_set = 1'b0;
+        end else if(counter == 2'b00) begin
+            rst = 1'b1;
+            counter = counter + 2'b01;
+        end
+        /*
         if(counter>3'b010) begin
             counter = 3'b000;
             rst = 1'b0;
@@ -28,25 +35,46 @@ module mac1 #(parameter ATTR_WIDTH = 24, RAM1_DATA_WIDTH = 24) (inputattr, input
                 counter = counter + 3'b001;
             //end
         end
+        */
+    end
 
+
+        always @(posedge clk) begin
+
+            if(rst==1'b1) begin
+                sum = 0;
+                ctr_set = 1'b0;
+                rst = 1'b0;
+            end
+
+            if(ctr_set==1'b1) begin
+                prod = a*b;
+                sum = prod+sum;
+                ctr_set = 1'b0;
+            end
+        end
+
+
+    always @(counter) begin
         case(counter)
-            3'b000 : begin
+            2'b00 : begin
+                        rst = 1'b1;
                         b = {2'b00,inputcoeff[RAM1_DATA_WIDTH-1:RAM1_DATA_WIDTH-8]};
                         a = {2'b00,inputattr[ATTR_WIDTH-1:ATTR_WIDTH-8]};
                     end
 
-            3'b001 : begin
+            2'b01 : begin
                         b = {2'b00,inputcoeff[RAM1_DATA_WIDTH-9:RAM1_DATA_WIDTH-16]};
                         a = {2'b00,inputattr[ATTR_WIDTH-9:ATTR_WIDTH-16]};
                     end
-            3'b010 : begin
+
+            2'b10 : begin
                         b = {2'b00,inputcoeff[RAM1_DATA_WIDTH-17:RAM1_DATA_WIDTH-24]};
                         a = {2'b00,inputattr[ATTR_WIDTH-17:ATTR_WIDTH-24]};
-                        acc = sum;
                     end
-            3'b011 : begin
+
+            2'b11 : begin
                         //b <= inputcoeffreg[RAM1_DATA_WIDTH-25:RAM1_DATA_WIDTH-34];
-                        rst = 1'b1;
                         acc = sum;
 					end
 
@@ -55,16 +83,15 @@ module mac1 #(parameter ATTR_WIDTH = 24, RAM1_DATA_WIDTH = 24) (inputattr, input
                         b = 8'bx;
                       end
         endcase
+        ctr_set = 1'b1;
     end
 
+    /*
     always @(posedge clk) begin
-        if(rst==1'b1) begin
-            sum = 0;
-        end else begin
-       //     regg = sum;
-            prod = a*b;
-            sum = prod+sum;
-        end
+        a1 <= a;
+        a2 <= a1;
     end
- //   assign accwire = sum;
+     //   assign accwire = sum;
+
+*/
 endmodule
