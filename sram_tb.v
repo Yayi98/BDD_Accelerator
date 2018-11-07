@@ -56,8 +56,6 @@ module sram_basic_testbench();
         .data_a(data_a),
         .data_b(data_b),
         .we_a(we_a),
-        .we_b(we_b),
-        .q_a(q_a),
         .q_b(q_b)
         );
 

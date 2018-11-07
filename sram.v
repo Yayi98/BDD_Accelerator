@@ -8,7 +8,7 @@ module sram #(parameter ADDR_WIDTH = 8, DATA_WIDTH = 34, DEPTH = 8) (
 
 	// Declare the RAM variable
 	reg [DATA_WIDTH-1:0] ram [0:DEPTH-1];
-    	reg [DATA_WIDTH-1:0] q_a;
+	reg [DATA_WIDTH-1:0] q_a;
 	// Port A
 	always @ (posedge clk) begin
 		if (we_a) begin
