@@ -1,12 +1,12 @@
-module mac1_tb();
+module mac_macro_tb();
 
-    reg [31:0] p;
+    wire [31:0] p;
     reg [15:0] a,b;
     reg clk;
     reg CE = 1;
     reg ci = 0;
 
-    mac1 DUT (.clk(CLK), .CE(CE),.ci(CARRYIN), .p(p_out, .a(A), .b(b));
+    mac_macro DUT (.CLK(clk), .CE(CE), .CARRYIN(ci), .p_out(p), .A(a), .B(b));
 
     always begin
         #20 clk = ~clk;
