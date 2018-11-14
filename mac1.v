@@ -6,7 +6,7 @@ module mac1 #(parameter ATTR_WIDTH = 24, RAM1_DATA_WIDTH = 24) (inputattr, input
 
     reg [19:0] prod,sum;
     reg  ctr_set;
-    reg [9:0] a,a1,a2,b;
+    reg [9:0] a,b;
     reg [1:0] counter = 2'b11; //2s(-1)
     reg rst = 1'b0;
 
@@ -37,7 +37,6 @@ module mac1 #(parameter ATTR_WIDTH = 24, RAM1_DATA_WIDTH = 24) (inputattr, input
                         a = {2'b00,inputattr[ATTR_WIDTH-1:ATTR_WIDTH-8]};
                         ctr_set = 1'b1;
                     end
-
             2'b01 : begin
                         b = {2'b00,inputcoeff[RAM1_DATA_WIDTH-9:RAM1_DATA_WIDTH-16]};
                         a = {2'b00,inputattr[ATTR_WIDTH-9:ATTR_WIDTH-16]};
@@ -53,6 +52,7 @@ module mac1 #(parameter ATTR_WIDTH = 24, RAM1_DATA_WIDTH = 24) (inputattr, input
                         acc = sum;
                         sum=0;
                         ctr_set = 1'b0;
+                        counter = 2'b11;
 					end
 
             default : begin
