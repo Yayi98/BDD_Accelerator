@@ -39,6 +39,17 @@ class Edge:
         leftnode.neighbor.append(rightnode)
         Edge.edge_dict[self.edge_id] = self
         Edge.edge_count += 1
+
+class NodeBDD:
+    nodeCount = 0
+    nodeDict = {}
+    def __init__(self, edgeId):
+        self.edgeId = edgeId
+        self.leftChild = None
+        self.rightChild = None
+        self.Id = NodeBDD.nodeCount
+        NodeBDD.nodeCount += 1
+
     
 def gen_edge_layer(leftlayer,rightlayer):
     for node in leftlayer:
@@ -62,8 +73,22 @@ def gen_graph(sku_dict, loc_dict): # Should generate 140 edges but generating 14
     return np.transpose(graph)
 
 # 1st traversal of bdd (software traversal)
-def gen_bdd(graph):
-    
+# If edgeId in NodeBDD is negative, the edge between its parent and itself is dotted
+# Hence, leftchild always has a negative edgeId
+# Prune '0' paths
+
+def gen_bdd(edgeDictKeys):
+    for i in edgeDictKeys:
+        holder = [NodeBDD(edgeDictKeys[i]) for j in range(2**i)]
+        for elem in holder:
+            elem.leftChild = NodeBDD(-edgeDictKeys[i+1])
+            elem.rightChild = NodeBDD(edgeDictKeys[i+1])
+
+# Should update node.skus and capacities
+
+def traverse_bdd(NodeBDD_dict,paths):
+
+
 
 
 
