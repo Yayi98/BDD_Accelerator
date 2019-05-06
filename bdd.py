@@ -70,18 +70,22 @@ def gen_graph(sku_dict, loc_dict): # Should generate 140 edges but generating 14
     graph = [[Node(sku,loc) for loc in loc_dict.keys()] for sku in sku_dict.keys()] # Generating transpose of graph
     for i in range(len(sku_dict.keys()) - 1):
         gen_edge_layer(graph[i],graph[i+1])
-    return np.transpose(graph)
+    #return np.transpose(graph)
 
+gen_graph(sku_dict, loc_dict)
 
 # If edgeId in NodeBDD is negative, the edge between its parent and itself is dotted
 # Hence, leftchild always has a negative edgeId
 
 def gen_bdd(edgeDictKeys):
-    for i in edgeDictKeys:
-        holder = [NodeBDD(edgeDictKeys[i]) for j in range(2**i)]
+    for i in range(len(edgeDictKeys)):
+        holder = [NodeBDD(i) for j in range(2**i)]
         for elem in holder:
-            elem.leftChild = NodeBDD(-edgeDictKeys[i+1])
-            elem.rightChild = NodeBDD(edgeDictKeys[i+1])
+            elem.leftChild = NodeBDD(-i-1)
+            elem.rightChild = NodeBDD(i+1)
+
+gen_bdd(range(10))
+print('BDD node count', NodeBDD.nodeCount)
 
 # 1st traversal of bdd (software traversal)
 # Should update node.skus and capacities
@@ -89,7 +93,17 @@ def gen_bdd(edgeDictKeys):
 # After a path is traversed node.skus and its capacity must be reset
 # paths will be a list of all paths represented in binary. 0 go left, 1 go right
 
-def traverse_bdd(NodeBDD_dict, paths):
+def gen_paths(nb_edges):
+    paths = []
+    string = '0'*nb_edges
+    for i in range(nb_edges):
+        paths.append(string[:len(string) - len(bin(i)[2:])] + bin(i)[2:])
+    return paths
+
+paths = gen_paths(5)
+print('paths ', paths)
+
+#def traverse_bdd(NodeBDD_dict, paths):
 
 
 
