@@ -77,15 +77,14 @@ gen_graph(sku_dict, loc_dict)
 # If edgeId in NodeBDD is negative, the edge between its parent and itself is dotted
 # Hence, leftchild always has a negative edgeId
 
-def gen_bdd(edgeDictKeys):
-    for i in range(len(edgeDictKeys)):
+def gen_bdd(nb_edges):
+    for i in range(nb_edges):
         holder = [NodeBDD(i) for j in range(2**i)]
         for elem in holder:
-            elem.leftChild = NodeBDD(-i-1)
+            elem.leftChild = NodeBDD(i+1)
             elem.rightChild = NodeBDD(i+1)
 
-gen_bdd(range(10))
-print('BDD node count', NodeBDD.nodeCount)
+gen_bdd(Edge.edge_count)
 
 # 1st traversal of bdd (software traversal)
 # Should update node.skus and capacities
@@ -100,10 +99,21 @@ def gen_paths(nb_edges):
         paths.append(string[:len(string) - len(bin(i)[2:])] + bin(i)[2:])
     return paths
 
-paths = gen_paths(5)
-print('paths ', paths)
+# This dict will have paths as keys and path cost as value, initialized to None
+path_cost_dict = dict.fromkeys(gen_paths(Edge.edge_count), None)
 
-#def traverse_bdd(NodeBDD_dict, paths):
+def traverse_bdd(NodeBDD_dict, paths):
+    curr_node = NodeBDD.nodeDict[0]
+    cost = 0
+    for path in paths:
+        for char in path:
+            if char == '0':
+                curr_node = curr_node.leftChild
+            else:
+                # update capacity
+                # update Node.skus
+                # update cost
+                curr_node = curr_node.rightChild
 
 
 
