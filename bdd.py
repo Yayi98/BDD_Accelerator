@@ -101,16 +101,14 @@ path_cost_dict = dict.fromkeys(gen_paths(Edge.edge_count), None)
 # Prune '0' paths
 # After a path is traversed node.sku and its capacity must be reset
 # paths will be a list of all paths represented in binary. 0 go left, 1 go right
-# First traversal doesn't require cumulation of costs
-# I'm doing it as we can verify fpga's results later on
 
 def traverse_bdd(NodeBDD_dict, paths, loc_dict):
     curr_node = NodeBDD.nodeDict[0]
     invalid_paths = []
     for path in paths:
         path_validity = True
-        for char in path:
-            if char == '0':
+        for direction in path:
+            if not int(direction):
                 curr_node = curr_node.leftChild
             else:
                 # update capacity
