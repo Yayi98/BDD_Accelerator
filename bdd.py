@@ -104,8 +104,8 @@ path_cost_dict = dict.fromkeys(gen_paths(Edge.edge_count), None)
 
 def traverse_bdd(NodeBDD_dict, paths):
     curr_node = NodeBDD.nodeDict[0]
-    cost = 0
     for path in paths:
+        cost = 0
         for char in path:
             if char == '0':
                 curr_node = curr_node.leftChild
@@ -114,6 +114,7 @@ def traverse_bdd(NodeBDD_dict, paths):
                 # update Node.skus
                 # update cost
                 curr_node = curr_node.rightChild
+        path_cost_dict[path] = cost
 
 
 
