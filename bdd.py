@@ -17,7 +17,7 @@ class Node:
     node_count = 0
     node_dict = {}
     def __init__(self, sku, loc):
-        self.skus = [sku]
+        self.sku_name = sku
         self.current_vol = loc_dict[loc] # Initialize assuming locations are empty inspite of skus being stored
         self.loc_id = loc
         self.node_id = Node.node_count
@@ -25,7 +25,7 @@ class Node:
         Node.node_dict[self.node_id] = self
         Node.node_count += 1
 
-# Capacity of locations and node_obj.skus can be updated as the skus are being placed only after bdd is generated. Not possible before.
+# Capacity of locations and node_obj.sku can be updated as the skus are being placed only after bdd is generated. Not possible before.
 
 
 
@@ -36,7 +36,7 @@ class Edge:
         self.edge_id = Edge.edge_count
         self.leftnode = leftnode
         self.rightnode = rightnode
-        leftnode.neighbor.append(rightnode)
+        leftnode.neighbor.append(rightnode) # Do I need this?
         Edge.edge_dict[self.edge_id] = self
         Edge.edge_count += 1
 
@@ -86,12 +86,6 @@ def gen_bdd(nb_edges):
 
 gen_bdd(Edge.edge_count)
 
-# 1st traversal of bdd (software traversal)
-# Should update node.skus and capacities
-# Prune '0' paths
-# After a path is traversed node.skus and its capacity must be reset
-# paths will be a list of all paths represented in binary. 0 go left, 1 go right
-
 def gen_paths(nb_edges):
     paths = []
     string = '0' * (nb_edges - 1)
@@ -102,22 +96,36 @@ def gen_paths(nb_edges):
 # This dict will have paths as keys and path cost as value, initialized to None
 path_cost_dict = dict.fromkeys(gen_paths(Edge.edge_count), None)
 
-def traverse_bdd(NodeBDD_dict, paths):
+# 1st traversal of bdd (software traversal)
+# Should update node.sku and capacities
+# Prune '0' paths
+# After a path is traversed node.sku and its capacity must be reset
+# paths will be a list of all paths represented in binary. 0 go left, 1 go right
+# First traversal doesn't require cumulation of costs
+# I'm doing it as we can verify fpga's results later on
+
+def traverse_bdd(NodeBDD_dict, paths, loc_dict):
     curr_node = NodeBDD.nodeDict[0]
+    invalid_paths = []
     for path in paths:
-        cost = 0
+        path_validity = True
         for char in path:
             if char == '0':
                 curr_node = curr_node.leftChild
             else:
                 # update capacity
-                # update Node.skus
-                # update cost
+                if 0 <= curr_node.edgeId < 2**len(loc_dict):
+                    # update capacity and node.sku of leftnode and rightnode attributes
+                    Edge.edge_dict[curr_node.edgeId].leftnode.current_vol -= sku_dict[Edge.edge_dict[curr_node.edgeId].leftnode.sku_name]
+                    Edge.edge_dict[curr_node.edgeId].rightnode.current_vol -= sku_dict[Edge.edge_dict[curr_node.edgeId].rightnode.sku_name]
+                else:
+                    # update capacity and node.sku of rightnode attr only
+                    Edge.edge_dict[curr_node.edgeId].rightnode.current_vol -= sku_dict[Edge.edge_dict[curr_node.edgeId].rightnode.sku_name]
+                    if Edge.edge_dict[curr_node.edgeId].rightnode.current_vol < 0:
+                        path_validity = False
                 curr_node = curr_node.rightChild
-        path_cost_dict[path] = cost
+        if not path_validity:
+            invalid_paths.append(path)
+    return list(set(paths) ^ set(invalid_paths))
 
-
-
-
-
-
+#################### Begin Debugging ########################################
