@@ -95,8 +95,8 @@ print('BDD node count', NodeBDD.nodeCount)
 
 def gen_paths(nb_edges):
     paths = []
-    string = '0'*nb_edges
-    for i in range(nb_edges):
+    string = '0' * (nb_edges - 1)
+    for i in range(2**(nb_edges - 1)):
         paths.append(string[:len(string) - len(bin(i)[2:])] + bin(i)[2:])
     return paths
 
