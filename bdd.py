@@ -70,7 +70,6 @@ def gen_graph(sku_dict, loc_dict): # Should generate 140 edges but generating 14
     graph = [[Node(sku,loc) for loc in loc_dict.keys()] for sku in sku_dict.keys()] # Generating transpose of graph
     for i in range(len(sku_dict.keys()) - 1):
         gen_edge_layer(graph[i],graph[i+1])
-    #return np.transpose(graph)
 
 gen_graph(sku_dict, loc_dict)
 
@@ -94,7 +93,8 @@ def gen_paths(nb_edges):
     return paths
 
 # This dict will have paths as keys and path cost as value, initialized to None
-path_cost_dict = dict.fromkeys(gen_paths(Edge.edge_count), None)
+paths = gen_paths(Edge.edge_count)
+path_cost_dict = dict.fromkeys(paths, None)
 
 # 1st traversal of bdd (software traversal)
 # Should update node.sku and capacities
@@ -124,6 +124,9 @@ def traverse_bdd(NodeBDD_dict, paths, loc_dict):
                 curr_node = curr_node.rightChild
         if not path_validity:
             invalid_paths.append(path)
+    print('Zero paths ', invalid_paths)
     return list(set(paths) ^ set(invalid_paths))
 
 #################### Begin Debugging ########################################
+
+print(traverse_bdd(NodeBDD.nodeDict, paths, loc_dict))
