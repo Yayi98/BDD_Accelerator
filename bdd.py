@@ -27,8 +27,6 @@ class Node:
 
 # Capacity of locations and node_obj.sku can be updated as the skus are being placed only after bdd is generated. Not possible before.
 
-
-
 class Edge:
     edge_count = 0
     edge_dict = {}
@@ -53,17 +51,14 @@ class NodeBDD:
         NodeBDD.nodeDict[NodeBDD.nodeCount] = self
         NodeBDD.nodeCount += 1
         
-    
 class Leafnode:
     def __init__(self,path_validity):
         self.ispath = path_validity
 
-    
 def gen_edge_layer(leftlayer,rightlayer):
     for node in leftlayer:
         for _node in rightlayer:
             Edge(node,_node)
-
 
 '''
 L1 O  O  O  O  O
@@ -72,8 +67,6 @@ L3 O  O  O  O  O
 L4 O  O  O  O  O
    S1 S2 S3 S4 S5
 '''
-
-
 
 def gen_graph(sku_dict, loc_dict): # Should generate 140 edges but generating 144
     graph = [[Node(sku,loc) for loc in loc_dict.keys()] for sku in sku_dict.keys()] # Generating transpose of graph
