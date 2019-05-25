@@ -10,10 +10,6 @@ def load_data(filename): #To load csv files and create dictionaries of sku:sku_v
             mydict = {rows[0]:float(rows[1]) for rows in reader}
     return mydict
 
-
-
-print('SKU ',sku_dict['SKU1'])
-
 class Node:
     node_count = 0
     node_dict = {}
@@ -156,67 +152,3 @@ if __name__ == "__main__":
     gen_graph(sku_dict, loc_dict)
     testrun1 = traverse_gen_bdd(Edge.edge_count+1, sku_dict, loc_dict)
     print('testrun = ',testrun1)
-
-
-
-
-# If edgeId in NodeBDD is negative, the edge between its parent and itself is dotted
-# Hence, leftchild always has a negative edgeId
-
-# def gen_bdd(nb_edges):
-#     for i in range(nb_edges):
-#         print('loop 1 i = ', i)
-#         holder = [NodeBDD(i) for j in range(2**i)]
-#         #print('holder = ', holder)
-#         for elem in holder:
-#             #print('elem.edgeId = ', elem.edgeId)
-#             elem.leftChild = NodeBDD(i+1)
-#             elem.rightChild = NodeBDD(i+1)
-
-# gen_bdd(Edge.edge_count)
-
-# def gen_paths(nb_edges):
-#     paths = []
-#     string = '0' * (nb_edges - 1)
-#     for i in range(2**(nb_edges - 1)):
-#         paths.append(string[:len(string) - len(bin(i)[2:])] + bin(i)[2:])
-#     return paths
-
-# # This dict will have paths as keys and path cost as value, initialized to None
-# paths = gen_paths(Edge.edge_count)
-# path_cost_dict = dict.fromkeys(paths, None)
-
-# # 1st traversal of bdd (software traversal)
-# # Should update node.sku and capacities
-# # Prune '0' paths
-# # After a path is traversed node.sku and its capacity must be reset
-# # paths will be a list of all paths represented in binary. 0 go left, 1 go right
-
-# def traverse_bdd(NodeBDD_dict, paths, loc_dict):
-#     curr_node = NodeBDD.nodeDict[0]
-#     invalid_paths = []
-#     for path in paths:
-#         path_validity = True
-#         for direction in path:
-#             if not int(direction):
-#                 curr_node = curr_node.leftChild
-#             else:
-#                 # update capacity
-#                 if 0 <= curr_node.edgeId < 2**len(loc_dict):
-#                     # update capacity and node.sku of leftnode and rightnode attributes
-#                     Edge.edge_dict[curr_node.edgeId].leftnode.current_vol -= sku_dict[Edge.edge_dict[curr_node.edgeId].leftnode.sku_name]
-#                     Edge.edge_dict[curr_node.edgeId].rightnode.current_vol -= sku_dict[Edge.edge_dict[curr_node.edgeId].rightnode.sku_name]
-#                 else:
-#                     # update capacity and node.sku of rightnode attr only
-#                     Edge.edge_dict[curr_node.edgeId].rightnode.current_vol -= sku_dict[Edge.edge_dict[curr_node.edgeId].rightnode.sku_name]
-#                     if Edge.edge_dict[curr_node.edgeId].rightnode.current_vol < 0:
-#                         path_validity = False
-#                 curr_node = curr_node.rightChild
-#         if not path_validity:
-#             invalid_paths.append(path)
-#     print('Zero paths ', invalid_paths)
-#     return list(set(paths) ^ set(invalid_paths))
-
-# #################### Begin Debugging ########################################
-
-# print(traverse_bdd(NodeBDD.nodeDict, paths, loc_dict))
