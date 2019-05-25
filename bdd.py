@@ -10,8 +10,9 @@ def load_data(filename): #To load csv files and create dictionaries of sku:sku_v
             mydict = {rows[0]:float(rows[1]) for rows in reader}
     return mydict
 
-sku_dict = load_data('sku_volume_test.csv')
-loc_dict = load_data('location_capacity_test.csv')
+
+
+print('SKU ',sku_dict['SKU1'])
 
 class Node:
     node_count = 0
@@ -25,8 +26,7 @@ class Node:
         Node.node_dict[self.node_id] = self
         Node.node_count += 1
 
-# Capacity of locations and node_obj.sku can be updated as the skus are being placed only after bdd is generated. Not possible before.
-
+# Class for Edges in the graph. No class required for edges in the BDD
 class Edge:
     edge_count = 0
     edge_dict = {}
@@ -34,10 +34,10 @@ class Edge:
         self.edge_id = Edge.edge_count
         self.leftnode = leftnode
         self.rightnode = rightnode
-        #leftnode.neighbor.append(rightnode) # Do I need this?
         Edge.edge_dict[self.edge_id] = self
         Edge.edge_count += 1
 
+# Class for nodes in the BDD. This is different from 'Node's in the graph
 class NodeBDD:
     nodeCount = 0
     nodeDict = {}
@@ -50,15 +50,19 @@ class NodeBDD:
         self.ispathright = False
         NodeBDD.nodeDict[NodeBDD.nodeCount] = self
         NodeBDD.nodeCount += 1
-        
+
+# Terminal nodes in the BDD
 class Leafnode:
     def __init__(self,path_validity):
         self.ispath = path_validity
 
+# Generates edges for two columns in the graph
 def gen_edge_layer(leftlayer,rightlayer):
     for node in leftlayer:
         for _node in rightlayer:
             Edge(node,_node)
+
+# Structure of 'graph' is shown below
 
 '''
 L1 O  O  O  O  O
@@ -68,56 +72,92 @@ L4 O  O  O  O  O
    S1 S2 S3 S4 S5
 '''
 
-def gen_graph(sku_dict, loc_dict): # Should generate 140 edges but generating 144
+# Generating the graph
+def gen_graph(sku_dict, loc_dict):
+    # Generating nodes in the graph 
     graph = [[Node(sku,loc) for loc in loc_dict.keys()] for sku in sku_dict.keys()] # Generating transpose of graph
+    # Generating edges in the graph
     for i in range(len(sku_dict.keys()) - 1):
         gen_edge_layer(graph[i],graph[i+1])
+    # Orientation of the matrix is irrelevant as nodes in the graph have distinct identities
 
-gen_graph(sku_dict, loc_dict)
 
 # In the BDD, node(edge_Id) -----> node(edge_Id + 1)
-# This indicates that edge with edgeId = edge_Id in the locsku matrix is taken but not edge with edgeId = edge_Id + 1
+# This indicates that edge with edgeId = edge_Id in the graph is taken but not edge with edgeId = edge_Id + 1
 
-def updateLocVol(loc_dict, edgeId):
-    Edge.edge_dict[edgeId].rightnode.current_vol -= Node.node_dict[Edge.edge_dict[edgeId].rightnode.sku_name]
+######################
+# This has bugs...
+######################
+def updateLocVol(sku_dict, loc_dict, edgeId):
+    # print('LHS type = ',type(Edge.edge_dict[edgeId].rightnode.current_vol))
+    # print('RHS nest type = ',type(Edge.edge_dict[edgeId].rightnode.sku_name)) 
+    # print('RHS type = ',type(Node.node_dict[Edge.edge_dict[edgeId].rightnode.sku_name]))
+    Edge.edge_dict[edgeId].rightnode.current_vol -= sku_dict[Edge.edge_dict[edgeId].rightnode.sku_name]
     if Edge.edge_dict[edgeId].rightnode.current_vol < 0:
         return None
     else:
-        loc_dict[Edge.edge_dict[edgeId].rightnode.loc_id] -= Node.node_dict[Edge.edge_dict[edgeId].rightnode.sku_name]
+        print('lhs nest type', Edge.edge_dict[edgeId].rightnode.loc_id)
+        print('rhs nest type', Edge.edge_dict[edgeId].rightnode.sku_name)
+        print('lhs type = ', type(loc_dict[Edge.edge_dict[edgeId].rightnode.loc_id]))
+        print('rhs type = ', type(sku_dict[Edge.edge_dict[edgeId].rightnode.sku_name]))
+        loc_dict[Edge.edge_dict[edgeId].rightnode.loc_id] -= sku_dict[Edge.edge_dict[edgeId].rightnode.sku_name]
         return loc_dict
 
-
-def traverse_gen_bdd(nb_edges, loc_dict):
-    nb_loc = len(loc_dict)
-    check = False
-    prev_layer = None
-    for i in range(nb_edges):
+# This function for generating the BDD and removing the infeasible / impossible paths simultaneously
+def traverse_gen_bdd(nb_edges, sku_dict, loc_dict):
+    nb_loc = len(loc_dict) # No. of locations
+    check = False # This variable decides what value prevLayer has to take
+    currLayer = None # This variable is for storing the previous layer in the BDD
+    # Iteration on no. of edges
+    # For the first loop prevLayer has to be just an edge (edge referring to edges in the graph) with an edgeId = 0
+    for i in range(nb_edges): 
         if not check:
-            curr_layer = [NodeBDD(i, loc_dict)]
+            prevLayer = [NodeBDD(i, loc_dict)]
         else:
-            curr_layer = cp.deepcopy(prev_layer)
+            prevLayer = cp.deepcopy(currLayer)
         next_layer = []
-        for node in curr_layer:
+        # Here node refers to nodes in the BDD
+        for node in prevLayer:
             node.leftChild = NodeBDD(i+1, loc_dict)
-            # Location capacity constraint
-            if updateLocVol(loc_dict, i) == None:
+            # Location capacity constraint = Locations running out of capacity is simulated here
+            if updateLocVol(sku_dict, loc_dict, i) == None: # This is the exception raised in the function 'updateLocVol'
                 node.rightChild = Leafnode(False)
                 next_layer.append(node.leftChild)
-            # Edge constraint between two columns of loc sku matrix
+            # Edge constraint between two columns of the graph
+
+            '''
+            Consider the first two columns in the graph
+            There are nb_loc**2 no. of edges between them
+            But you can only choose one of them
+            So many paths in the BDD can be eliminated right away
+            This is simulated here
+            '''
+
             elif node.ispathright:
                 node.rightChild = Leafnode(False)
                 next_layer.append(node.leftChild)
             else:
-                node.rightChild = NodeBDD(i+1, updateLocVol(loc_dict, i))
+                node.rightChild = NodeBDD(i+1, updateLocVol(sku_dict, loc_dict, i))
                 node.rightChild.ispathright = True
                 next_layer.extend([node.leftChild, node.rightChild])
         check = True
-        prev_layer = cp.deepcopy(next_layer)
+        currLayer = cp.deepcopy(next_layer)
 
         # Reset nodes at every nb_loc**2 layer in the bdd
         if i+1 % (nb_loc**2) == 0:
-            for _node in prev_layer:
+            for _node in currLayer:
                 _node.ispathright = False
+    
+    return NodeBDD.nodeDict[0]
+
+if __name__ == "__main__":
+    sku_dict = load_data('sku_volume_test.csv')
+    loc_dict = load_data('location_capacity_test.csv')
+    gen_graph(sku_dict, loc_dict)
+    testrun1 = traverse_gen_bdd(Edge.edge_count+1, sku_dict, loc_dict)
+    print('testrun = ',testrun1)
+
+
 
 
 # If edgeId in NodeBDD is negative, the edge between its parent and itself is dotted
