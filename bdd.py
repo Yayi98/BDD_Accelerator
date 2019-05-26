@@ -1,6 +1,7 @@
 import numpy as np
 import csv
 import copy as cp
+import pdb
 
 def load_data(filename): #To load csv files and create dictionaries of sku:sku_vol and loc:loc_vol
     with open(filename, mode='r') as infile:
@@ -85,18 +86,23 @@ def gen_graph(sku_dict, loc_dict):
 # This has bugs...
 ######################
 def updateLocVol(sku_dict, loc_dict, edgeId):
-    print("Vol before placing sku = ", Edge.edge_dict[edgeId].leftnode.current_vol)
-    print(" sku vol = ", sku_dict[Edge.edge_dict[edgeId].leftnode.sku_name])
+    # print('LHS type = ',type(Edge.edge_dict[edgeId].rightnode.current_vol))
+    # print('RHS nest type = ',type(Edge.edge_dict[edgeId].rightnode.sku_name)) 
+    # print('RHS type = ',type(Node.node_dict[Edge.edge_dict[edgeId].rightnode.sku_name]))
+    print('vol before = ', Edge.edge_dict[edgeId].leftnode.current_vol)
+    print('vol of sku = ', sku_dict[Edge.edge_dict[edgeId].leftnode.sku_name])
     Edge.edge_dict[edgeId].leftnode.current_vol -= sku_dict[Edge.edge_dict[edgeId].leftnode.sku_name]
-    print("Vol after placing sku", Edge.edge_dict[edgeId].leftnode.current_vol)
+    print('vol after = ', Edge.edge_dict[edgeId].leftnode.current_vol)
     if Edge.edge_dict[edgeId].leftnode.current_vol < 0:
-        print("Error")
+        #pdb.set_trace()
+        Edge.edge_dict[edgeId].leftnode.current_vol += sku_dict[Edge.edge_dict[edgeId].leftnode.sku_name]
         return None
     else:
-        print('lhs nest type', Edge.edge_dict[edgeId].rightnode.loc_id)
-        print('rhs nest type', Edge.edge_dict[edgeId].rightnode.sku_name)
-        print('lhs type = ', type(loc_dict[Edge.edge_dict[edgeId].rightnode.loc_id]))
-        print('rhs type = ', type(sku_dict[Edge.edge_dict[edgeId].rightnode.sku_name]))
+        # print('lhs nest type', Edge.edge_dict[edgeId].leftnode.loc_id)
+        # print('rhs nest type', Edge.edge_dict[edgeId].leftnode.sku_name)
+        # print('lhs type = ', type(loc_dict[Edge.edge_dict[edgeId].leftnode.loc_id]))
+        # print('rhs type = ', type(sku_dict[Edge.edge_dict[edgeId].leftnode.sku_name]))
+        #pdb.set_trace()
         loc_dict[Edge.edge_dict[edgeId].leftnode.loc_id] -= sku_dict[Edge.edge_dict[edgeId].leftnode.sku_name]
         return loc_dict
 
@@ -108,16 +114,17 @@ def traverse_gen_bdd(nb_edges, sku_dict, loc_dict):
     # Iteration on no. of edges
     # For the first loop prevLayer has to be just an edge (edge referring to edges in the graph) with an edgeId = 0
     for i in range(nb_edges): 
+        next_layer = []
         if not check:
             prevLayer = [NodeBDD(i, loc_dict)]
         else:
             prevLayer = cp.deepcopy(currLayer)
-        next_layer = []
         # Here node refers to nodes in the BDD
         for node in prevLayer:
             node.leftChild = NodeBDD(i+1, loc_dict)
             # Location capacity constraint = Locations running out of capacity is simulated here
             if updateLocVol(sku_dict, loc_dict, i) == None: # This is the exception raised in the function 'updateLocVol'
+                #pdb.set_trace()
                 node.rightChild = Leafnode(False)
                 next_layer.append(node.leftChild)
             # Edge constraint between two columns of the graph
@@ -129,22 +136,25 @@ def traverse_gen_bdd(nb_edges, sku_dict, loc_dict):
             So many paths in the BDD can be eliminated right away
             This is simulated here
             '''
-			
-            if node.ispathright:
+
+            if node.ispathright == True:
+                #pdb.set_trace()
                 node.rightChild = Leafnode(False)
                 next_layer.append(node.leftChild)
             else:
+                #pdb.set_trace()
                 node.rightChild = NodeBDD(i+1, updateLocVol(sku_dict, loc_dict, i))
                 node.rightChild.ispathright = True
                 next_layer.extend([node.leftChild, node.rightChild])
         check = True
         currLayer = cp.deepcopy(next_layer)
 
+        pdb.set_trace()
         # Reset nodes at every nb_loc**2 layer in the bdd
         if i+1 % (nb_loc**2) == 0:
             for _node in currLayer:
                 _node.ispathright = False
-    print('Test')
+    
     return NodeBDD.nodeDict[0]
 
 if __name__ == "__main__":
