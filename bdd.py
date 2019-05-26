@@ -85,18 +85,19 @@ def gen_graph(sku_dict, loc_dict):
 # This has bugs...
 ######################
 def updateLocVol(sku_dict, loc_dict, edgeId):
-    # print('LHS type = ',type(Edge.edge_dict[edgeId].rightnode.current_vol))
-    # print('RHS nest type = ',type(Edge.edge_dict[edgeId].rightnode.sku_name)) 
-    # print('RHS type = ',type(Node.node_dict[Edge.edge_dict[edgeId].rightnode.sku_name]))
-    Edge.edge_dict[edgeId].rightnode.current_vol -= sku_dict[Edge.edge_dict[edgeId].rightnode.sku_name]
-    if Edge.edge_dict[edgeId].rightnode.current_vol < 0:
+    print("Vol before placing sku = ", Edge.edge_dict[edgeId].leftnode.current_vol)
+    print(" sku vol = ", sku_dict[Edge.edge_dict[edgeId].leftnode.sku_name])
+    Edge.edge_dict[edgeId].leftnode.current_vol -= sku_dict[Edge.edge_dict[edgeId].leftnode.sku_name]
+    print("Vol after placing sku", Edge.edge_dict[edgeId].leftnode.current_vol)
+    if Edge.edge_dict[edgeId].leftnode.current_vol < 0:
+        print("Error")
         return None
     else:
         print('lhs nest type', Edge.edge_dict[edgeId].rightnode.loc_id)
         print('rhs nest type', Edge.edge_dict[edgeId].rightnode.sku_name)
         print('lhs type = ', type(loc_dict[Edge.edge_dict[edgeId].rightnode.loc_id]))
         print('rhs type = ', type(sku_dict[Edge.edge_dict[edgeId].rightnode.sku_name]))
-        loc_dict[Edge.edge_dict[edgeId].rightnode.loc_id] -= sku_dict[Edge.edge_dict[edgeId].rightnode.sku_name]
+        loc_dict[Edge.edge_dict[edgeId].leftnode.loc_id] -= sku_dict[Edge.edge_dict[edgeId].leftnode.sku_name]
         return loc_dict
 
 # This function for generating the BDD and removing the infeasible / impossible paths simultaneously
@@ -128,8 +129,8 @@ def traverse_gen_bdd(nb_edges, sku_dict, loc_dict):
             So many paths in the BDD can be eliminated right away
             This is simulated here
             '''
-
-            elif node.ispathright:
+			
+            if node.ispathright:
                 node.rightChild = Leafnode(False)
                 next_layer.append(node.leftChild)
             else:
@@ -143,7 +144,7 @@ def traverse_gen_bdd(nb_edges, sku_dict, loc_dict):
         if i+1 % (nb_loc**2) == 0:
             for _node in currLayer:
                 _node.ispathright = False
-    
+    print('Test')
     return NodeBDD.nodeDict[0]
 
 if __name__ == "__main__":
